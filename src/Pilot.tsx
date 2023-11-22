@@ -109,7 +109,7 @@ export const Pilot: React.FC<PilotProps> = (props) => {
         <div style={{ width: '100%', height: 80 }}>
           <ResponsiveContainer>
             <ScatterChart syncId='pilot'>
-              <XAxis dataKey="x" type="number" />
+              <XAxis dataKey="x" type="number" domain={[0, 'maxData']} />
               <YAxis dataKey="y" type="number" />
               <Tooltip content={CustomTooltip} />
               <Scatter name="a" data={table} fill="#82ca9d" shape={square(3, 8)} />
