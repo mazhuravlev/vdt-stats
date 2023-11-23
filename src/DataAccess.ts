@@ -1,25 +1,44 @@
 import moment from "moment";
-import { handleResponse, sum } from "./func";
+import { findLongestStreak, handleResponse, sum } from "./func";
 import { PilotData, PilotRecord } from "./types";
+import { defaultPilotsReplacement } from "./defaultPilotsReplacement";
 
 export class DataAccess {
     records: PilotRecord[] = []
     pilotRecords = new Map<string, PilotRecord[]>()
     pilotData: PilotData[] = []
-    private _init = false
 
     async init(): Promise<unknown> {
         console.log('init')
-        if (this._init) throw 'init'
-        this._init = true
-        return fetch('/data/vdt_record.csv')
+        this.records = []
+        this.pilotRecords = new Map<string, PilotRecord[]>()
+        this.pilotData = []
+
+        return fetch(`${import.meta.env.BASE_URL}data/vdt_record.csv`)
             .then(handleResponse)
             .then(res => res.text())
             .then(text => {
+                const sumPilotsDict: [string, Set<string>][] = (localStorage.getItem('sumPilots') ?? defaultPilotsReplacement)
+                    .split('\n')
+                    .map(x => x.trim())
+                    .filter(x => x)
+                    .flatMap(x => {
+                        const records = x.split(',').map(a => a.trim()).filter(a => a)
+                        if (records.length > 1) {
+                            return [[records[0], new Set(records.slice(1))]]
+                        }
+                        return []
+                    })
                 const lines = text.split('\n')
                 lines.slice(1).filter(x => x).map(l => {
                     const parts = l.split(',')
-                    const name = parts[2].replace('"', '')
+                    let name = parts[2].replace(/"/g, '')
+                    for (const sp of sumPilotsDict) {
+                        if (sp[1].has(name)) {
+                            name = sp[0]
+                            break
+                        }
+                    }
                     const record: PilotRecord = {
                         place: Number(parts[0]),
                         name,
@@ -43,8 +62,11 @@ export class DataAccess {
                 this.pilotData = [...this.pilotRecords.keys()]
                     .map(name => {
                         const records = this.pilotRecords.get(name)!
+                        const table = makeTable(records)
                         return {
                             name,
+                            table,
+                            longest_streak: findLongestStreak(table),
                             avg_delta: records
                                 .map(x => x.deltaPercent)
                                 .reduce(sum, 0) / records.length,
@@ -66,13 +88,18 @@ export class DataAccess {
     }
 
     async getPilotTable(name: string): Promise<number[]> {
-        const dates = this.pilotRecords.get(name)!.map(x => x.vdtDate)
-        const today = moment()
-        const table = dates.map(x => today.diff(moment(x, "YYYY-MM-DD"), 'days'))
-        return Promise.resolve(table)
+        return Promise.resolve(this.pilotData.find(x => x.name === name)!.table)
     }
 
     async getPilotRecords(name: string): Promise<PilotRecord[]> {
         return Promise.resolve(this.records.filter(x => x.name === name))
     }
+}
+
+function makeTable(records: PilotRecord[]): number[] {
+    const dates = records.map(x => x.vdtDate)
+    const today = moment()
+    const table = dates.map(x => today.diff(moment(x, "YYYY-MM-DD"), 'days'))
+    table.sort()
+    return table
 }

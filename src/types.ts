@@ -13,4 +13,6 @@ export interface PilotData {
     race_count: number;
     total_updates: number;
     avg_delta: number;
+    table: number[];
+    longest_streak: number;
 }

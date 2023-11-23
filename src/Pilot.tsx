@@ -69,8 +69,10 @@ export const Pilot: React.FC<PilotProps> = (props) => {
           return
         }
         const l = lowess(rec.map(x => x.index), rec.map(x => x.deltaPercent), { sorted: true, f })
-        for (let i = 0; i < rec.length; i++) {
-          rec[i].l = l.y[i] > 0 ? l.y[i] : 0
+        if ('x' in l) {
+          for (let i = 0; i < rec.length; i++) {
+            rec[i].l = l.y[i] > 0 ? l.y[i] : 0
+          }
         }
         setRecords(rec)
       })
@@ -105,6 +107,7 @@ export const Pilot: React.FC<PilotProps> = (props) => {
           <tr><td>Количество гонок</td><td>{pilot.race_count}</td></tr>
           <tr><td>Количество обновлений</td><td>{pilot.total_updates}</td></tr>
           <tr><td>Средняя дельта %</td><td>{pilot.avg_delta.toFixed(2)}</td></tr>
+          <tr><td>Макс. непрерывных дней гонок</td><td>{pilot.longest_streak}</td></tr>
         </tbody></table>}
         <div style={{ width: '100%', height: 80 }}>
           <ResponsiveContainer>
