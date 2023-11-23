@@ -9,7 +9,7 @@ import {
     HashRouter,
 } from "react-router-dom";
 import { Pilot } from './Pilot';
-import { Index } from './Index';
+import { PilotIndex } from './PilotIndex';
 import { Button } from 'primereact/button';
 import { DataAccess } from './DataAccess';
 
@@ -26,10 +26,10 @@ function App(props: { dataAccess: DataAccess }) {
                 element={<Pilot dataAccess={props.dataAccess} />} />
             <Route
                 path='/'
-                element={<Index dataAccess={props.dataAccess} />} />
+                element={<PilotIndex dataAccess={props.dataAccess} />} />
             <Route
                 path='/'
-                element={<Index dataAccess={props.dataAccess} />} />
+                element={<PilotIndex dataAccess={props.dataAccess} />} />
         </Routes>
     </HashRouter>
 }

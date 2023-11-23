@@ -16,3 +16,13 @@ export interface PilotData {
     table: number[];
     longest_streak: number;
 }
+
+export interface Vdt {
+    date: string
+    track: string
+    url: string
+    season: number
+    updates: number
+    pilots: number
+    type: '1lap' | '3lap'
+}

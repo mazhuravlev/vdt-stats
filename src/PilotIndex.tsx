@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { PilotData } from "./types"
 import { DataTable } from "primereact/datatable"
@@ -9,14 +9,21 @@ import { InputTextarea } from "primereact/inputtextarea"
 import { Button } from "primereact/button"
 import { Accordion, AccordionTab } from "primereact/accordion"
 import { defaultPilotsReplacement } from "./defaultPilotsReplacement"
+import { FilterMatchMode } from "primereact/api"
+import { InputText } from "primereact/inputtext"
 
 interface IndexProps {
     dataAccess: DataAccess
 }
 
-export const Index: React.FC<IndexProps> = (props) => {
+export const PilotIndex: React.FC<IndexProps> = (props) => {
     const [pilots, setPilotData] = useState<PilotData[]>([])
     const [paginator, setPaginator] = useState(true)
+
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    });
+    const [globalFilterValue, setGlobalFilterValue] = useState('')
 
     const getData = () =>
         props.dataAccess.getPilots()
@@ -26,8 +33,20 @@ export const Index: React.FC<IndexProps> = (props) => {
 
     const applySavePilots = () => {
         localStorage.setItem('sumPilots', sumPilots)
-        props.dataAccess.init().then(() => getData())
+        props.dataAccess.init().then(() => {
+            getData()
+        })
     }
+
+    const onGlobalFilterChange = (e: any) => {
+        const value = e.target.value;
+        let _filters = { ...filters };
+
+        _filters['global'].value = value;
+
+        setFilters(_filters);
+        setGlobalFilterValue(value);
+    };
 
     const [sumPilots, setSumPilots] = useState(localStorage.getItem('sumPilots') ?? defaultPilotsReplacement)
 
@@ -50,7 +69,15 @@ export const Index: React.FC<IndexProps> = (props) => {
             </AccordionTab>
         </Accordion>
         <div>
+            <div className="flex justify-content-start m-2">
+                <span className="p-input-icon-left">
+                    <i className="pi pi-search" />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search" />
+                </span>
+            </div>
             <DataTable
+                filters={filters}
+                globalFilterFields={['name']}
                 paginator={paginator} rows={50}
                 stripedRows size='small'
                 value={pilots}
