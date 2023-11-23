@@ -126,6 +126,5 @@ function makeTable(records: PilotRecord[]): number[] {
     const dates = records.map(x => x.vdtDate)
     const today = moment()
     const table = dates.map(x => today.diff(moment(x, "YYYY-MM-DD"), 'days'))
-    table.sort()
     return table
 }

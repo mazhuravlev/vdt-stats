@@ -111,7 +111,10 @@ export const Pilot: React.FC<PilotProps> = (props) => {
         </tbody></table>}
         <div style={{ width: '100%', height: 80 }}>
           <ResponsiveContainer>
-            <ScatterChart syncId='pilot'>
+            <ScatterChart
+              syncId='pilot'
+              syncMethod={(_a: any, b: any) => b.activeLabel}
+            >
               <XAxis dataKey="x" type="number" domain={[0, 'maxData']} />
               <YAxis dataKey="y" type="number" />
               <Tooltip content={CustomTooltip} />
