@@ -13,17 +13,20 @@
   },
   "dependencies": {
     "@stdlib/stats-lowess": "^0.1.0",
+    "@types/sql.js": "^1.4.9",
     "@uidotdev/usehooks": "^2.4.1",
     "commons-math-interpolation": "github:chdh/commons-math-interpolation",
+    "date-fns": "^2.30.0",
     "gh-pages": "^6.1.0",
-    "moment": "^2.29.4",
     "primeflex": "^3.3.1",
     "primereact": "^10.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "2.4.1",
     "react-router-dom": "^6.19.0",
     "recharts": "2.10.1",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "sql.js": "1.8.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

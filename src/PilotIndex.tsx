@@ -38,6 +38,15 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
         })
     }
 
+    const resetSumPilots = () => {
+        const x = defaultPilotsReplacement;
+        localStorage.setItem('sumPilots', x)
+        setSumPilots(x)
+        props.dataAccess.init().then(() => {
+            getData()
+        })
+    }
+
     const onGlobalFilterChange = (e: any) => {
         const value = e.target.value;
         let _filters = { ...filters };
@@ -65,6 +74,7 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
                 <div className="m-2">
                     <InputTextarea value={sumPilots} onChange={e => setSumPilots(e.target.value)} rows={5} cols={50} />
                     <Button className="m-2" onClick={applySavePilots}>Save</Button>
+                    <Button className="m-2" onClick={resetSumPilots}>Reset</Button>
                 </div>
             </AccordionTab>
         </Accordion>

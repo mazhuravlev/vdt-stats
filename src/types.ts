@@ -26,3 +26,19 @@ export interface Vdt {
     pilots: number
     type: '1lap' | '3lap'
 }
+
+export interface VdtRecord {
+    id: string
+    place: number
+    globalPlace: number
+    name: string
+    time: number
+    drone: string
+    updates: number
+    updateTime: string
+    deltaTime: number
+    deltaPercent: number
+    vdtDate: string
+}
+
+export const vdtDateFormat = 'yyyy-MM-dd'

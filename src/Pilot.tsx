@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react'
 import { ScatterChart, XAxis, YAxis, Scatter, Tooltip, CartesianGrid, ComposedChart, Area, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { PilotData, PilotRecord } from './types'
+import { PilotData, PilotRecord, vdtDateFormat } from './types'
 import lowess from '@stdlib/stats-lowess'
 import { AutoComplete, AutoCompleteCompleteEvent } from "primereact/autocomplete";
 import { PrimeReactProvider } from 'primereact/api';
 import { Slider } from 'primereact/slider'
-import moment from 'moment'
 import { useDebounce } from './useDebounce'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import { Button } from 'primereact/button'
 import { useNavigate, useParams } from 'react-router-dom';
 import { DataAccess } from './DataAccess';
+import * as df from 'date-fns'
 
 interface PilotProps {
   dataAccess: DataAccess
@@ -118,7 +118,7 @@ export const Pilot: React.FC<PilotProps> = (props) => {
               <XAxis dataKey="x" type="number" domain={[0, 'maxData']} />
               <YAxis dataKey="y" type="number" />
               <Tooltip content={CustomTooltip} />
-              <Scatter name="a" data={table} fill="#82ca9d" shape={square(3, 8)} />
+              <Scatter name="a" data={table} fill="#82ca9d" shape={square(3, 12)} />
             </ScatterChart>
           </ResponsiveContainer>
         </div>
@@ -134,7 +134,9 @@ export const Pilot: React.FC<PilotProps> = (props) => {
                   value={f_ui} onChange={(e) => setF_ui(Number(e.value))} min={0.01} max={1} step={0.01} />
               </div>
               {selectedDates.length === 2 && <div className='flex-initial m-2'>
-                Разница в днях: {Math.abs(moment(selectedDates[0].date, "YYYY-MM-DD").diff(moment(selectedDates[1].date, "YYYY-MM-DD"), 'days'))}
+                Разница в днях: {Math.abs(df.differenceInCalendarDays(
+                  df.parse(selectedDates[0].date, vdtDateFormat, new Date()),
+                  df.parse(selectedDates[1].date, vdtDateFormat, new Date())))}
               </div>}
             </div>
             <div style={{ width: '100%', height: 500 }}>
@@ -174,7 +176,7 @@ const dot = (r: number) => (props: any) => <circle
 const square = (w: number, h: number) => (props: any) => <rect
   fill="#82ca9d"
   x={props.x}
-  y={props.y}
+  y={props.y - 8}
   width={w} height={h} />
 
 const CustomTooltip = (props: any) => {
@@ -182,7 +184,8 @@ const CustomTooltip = (props: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip">
-        {moment().subtract(payload[0].value, 'days').format('DD.MM.YYYY')}
+        {payload[0].value}
+        {/* {moment().subtract(payload[0].value, 'days').format('DD.MM.YYYY')} */}
       </div>
     );
   }
@@ -196,7 +199,7 @@ const CustomTooltip2 = (props: any) => {
     if (payload[0].payload && payload[0].payload.vdtDate) {
       return (
         <div className="custom-tooltip">
-          <p>{moment(payload[0].payload.vdtDate, "YYYY-MM-DD").format('DD.MM.YYYY')}</p>
+          <p>{df.format(df.parse(payload[0].payload.vdtDate, vdtDateFormat, new Date()), 'dd.mm.yy')}</p>
           <p>{payload[0].payload.l.toFixed(0)} %</p>
         </div>
       );

@@ -3,3 +3,11 @@
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 }
+
+.custom-tooltip {
+  background-color: #3f3f3f;
+  border: 1px solid white;
+  color: lightgray;
+  padding: 4px;
+  border-radius: 2px;
+}
