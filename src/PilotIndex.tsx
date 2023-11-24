@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { PilotData } from "./types"
+import { PilotData, vdtDateFormat } from "./types"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { DataAccess } from "./DataAccess"
@@ -11,6 +11,9 @@ import { Accordion, AccordionTab } from "primereact/accordion"
 import { defaultPilotsReplacement } from "./defaultPilotsReplacement"
 import { FilterMatchMode } from "primereact/api"
 import { InputText } from "primereact/inputtext"
+import { Calendar } from "primereact/calendar"
+import * as df from 'date-fns'
+import { Nullable } from "primereact/ts-helpers"
 
 interface IndexProps {
     dataAccess: DataAccess
@@ -62,6 +65,12 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
     useEffect(() => {
         getData()
     }, [])
+
+    const setDate = (date: Nullable<Date>): void => {
+        if (!date) return
+        props.dataAccess.setSeasonStartDate(date).then(() => getData())
+    }
+
     return <div>
         <Accordion>
             <AccordionTab header="Settings">
@@ -75,6 +84,15 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
                     <InputTextarea value={sumPilots} onChange={e => setSumPilots(e.target.value)} rows={5} cols={50} />
                     <Button className="m-2" onClick={applySavePilots}>Save</Button>
                     <Button className="m-2" onClick={resetSumPilots}>Reset</Button>
+                </div>
+                <div className="m-2">
+                    <label htmlFor="cal_date" className="mx-2">Season start</label>
+                    <Calendar
+                        id="cal_date"
+                        view='month'
+                        dateFormat="MM yy"
+                        value={df.parse(props.dataAccess.seasonStartDate, vdtDateFormat, new Date())}
+                        onChange={(e) => setDate(e.value)} />
                 </div>
             </AccordionTab>
         </Accordion>
@@ -97,7 +115,7 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
             >
                 <Column sortable field="name" header="Name" body={p => <Link to={`/pilot/${p.name}`}>{p.name}</Link>}></Column>
                 <Column sortable field="race_count" header="Race count"></Column>
-                <Column sortable field="avg_delta" header="Average delta %" body={x => x.avg_delta.toFixed(2)}></Column>
+                <Column sortable field="avg_delta" header="Average delta %" body={x => x.avg_delta?.toFixed(2) ?? '—'}></Column>
                 <Column sortable field="total_updates" header="Total updates"></Column>
                 <Column sortable field="longest_streak" header="Longest streak"></Column>
             </DataTable>

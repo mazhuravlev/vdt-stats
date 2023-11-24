@@ -4,6 +4,8 @@ import { defaultPilotsReplacement } from "./defaultPilotsReplacement";
 import initSqlJs, { Database } from "sql.js";
 import * as df from 'date-fns'
 
+const SEASON_START_DATE_KEY = 'season_start_date'
+
 export class DataAccess {
     records: PilotRecord[] = []
     pilotRecords = new Map<string, PilotRecord[]>()
@@ -11,6 +13,7 @@ export class DataAccess {
     private _db: Database | undefined;
     private _sqlPromise: Promise<unknown>;
     sumPilotsDict: [string, Set<string>][] = []
+    seasonStartDate: string = localStorage.getItem(SEASON_START_DATE_KEY) ?? '2019-01-01'
 
     constructor() {
         const sql = initSqlJs({
@@ -93,9 +96,7 @@ export class DataAccess {
                     name,
                     table,
                     longest_streak: findLongestStreak(table),
-                    avg_delta: records
-                        .map(x => x.deltaPercent)
-                        .reduce(sum, 0) / records.length,
+                    avg_delta: this.calculateDelta(records),
                     race_count: records.length,
                     total_updates: records
                         .map(x => x.updates)
@@ -104,6 +105,21 @@ export class DataAccess {
             })
 
         return Promise.resolve()
+    }
+
+    setSeasonStartDate(date: Date) {
+        const s = df.format(date, 'yyyy-MM-dd')
+        localStorage.setItem(SEASON_START_DATE_KEY, s)
+        this.seasonStartDate = s
+        return this.init()
+    }
+
+    private calculateDelta(records: PilotRecord[]): number | undefined {
+        const filteredRecords = records.filter(x => x.vdtDate >= this.seasonStartDate)
+        if (filteredRecords.length === 0) return undefined
+        return filteredRecords
+            .map(x => x.deltaPercent)
+            .reduce(sum, 0) / filteredRecords.length;
     }
 
     async getVdtList(): Promise<Vdt[]> {
