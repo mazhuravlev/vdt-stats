@@ -184,8 +184,7 @@ const CustomTooltip = (props: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="custom-tooltip">
-        {payload[0].value}
-        {/* {moment().subtract(payload[0].value, 'days').format('DD.MM.YYYY')} */}
+        {df.format(df.subDays(new Date(), payload[0].value), 'dd.MM.yyyy')}
       </div>
     );
   }
@@ -197,9 +196,10 @@ const CustomTooltip2 = (props: any) => {
   const { active, payload } = props
   if (active && payload && payload.length) {
     if (payload[0].payload && payload[0].payload.vdtDate) {
+      const d = df.parse(payload[0].payload.vdtDate, vdtDateFormat, new Date())
       return (
         <div className="custom-tooltip">
-          <p>{df.format(df.parse(payload[0].payload.vdtDate, vdtDateFormat, new Date()), 'dd.mm.yy')}</p>
+          <p>{df.format(d, 'dd.MM.yyyy')}</p>
           <p>{payload[0].payload.l.toFixed(0)} %</p>
         </div>
       );
