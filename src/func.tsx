@@ -24,3 +24,20 @@ export function assertDefined<T>(t: T | undefined | null, message?: any): T {
     if (t === undefined || t === null) throw `assertDefined ${message}`
     return t
 }
+
+export const assertString = (value: unknown): string => {
+    if (typeof value === 'string') return value
+    throw `assertString ${value}`
+}
+
+export function assertTrue(value: boolean) {
+    if (!value) throw 'assertTrue'
+}
+
+export const parseTrackName = (trackName: string): { map: string, track: string } => {
+    const parts = trackName.split('/').map(x => x.trim())
+    if (parts.length === 2) {
+        return { map: parts[0], track: parts[1] }
+    }
+    throw `parseTrackName '${trackName}'`
+}

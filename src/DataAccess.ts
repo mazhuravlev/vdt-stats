@@ -1,4 +1,4 @@
-import { assertDefined, findLongestStreak, sum } from "./func";
+import { assertDefined, assertString, assertTrue, findLongestStreak, parseTrackName, sum } from "./func";
 import { PilotData, PilotRecord, TrackSummary, Vdt, VdtRecord, vdtDateFormat } from "./types";
 import { defaultPilotsReplacement } from "./defaultPilotsReplacement";
 import initSqlJs, { Database } from "sql.js";
@@ -42,7 +42,7 @@ export class DataAccess {
         group by track 
         order by cnt desc, updates desc`)
         return q[0].values.map((x): TrackSummary => {
-            const [map, track] = (x[1] as string).split('/').map(x => x.trim())
+            const { map, track } = parseTrackName(assertString(x[1]))
             return ({
                 repeats: x[0] as number,
                 map,
@@ -104,6 +104,7 @@ export class DataAccess {
             }
 
         }
+        s.free()
 
         Array.from(this.pilotRecords.keys()).forEach(name => {
             const list = this.pilotRecords.get(name)!
@@ -154,21 +155,47 @@ export class DataAccess {
         return delta
     }
 
-    async getVdtList(): Promise<Vdt[]> {
+    async getVdtList(map?: string, track?: string): Promise<Vdt[]> {
         const db = await this.db()
-        const s = db.prepare('SELECT * from vdt')
-        const vdtList: Vdt[] = []
-        while (s.step()) {
-            const vdt = (s.getAsObject() as unknown) as Vdt
-            vdtList.push(vdt)
+        if (!map && !track) {
+            const s = db.prepare('SELECT * from vdt')
+            const vdtList: Vdt[] = []
+            while (s.step()) {
+                const vdt = (s.getAsObject() as unknown) as Vdt
+                vdtList.push(vdt)
+            }
+            s.free()
+            return vdtList
+        } else if (map && !track) {
+            const s = db.prepare(`SELECT * FROM vdt WHERE track LIKE :track`)
+            const vdtList: Vdt[] = []
+            assertTrue(s.bind({ ':track': `${map}%` }))
+            while (s.step()) {
+                const vdt = (s.getAsObject() as unknown) as Vdt
+                vdtList.push(vdt)
+            }
+            s.free()
+            return vdtList
+        } else if (map && track) {
+            const s = db.prepare('SELECT * FROM vdt WHERE track=:track')
+            const vdtList: Vdt[] = []
+            assertTrue(s.bind({ ':track': `${map} / ${track}` }))
+            while (s.step()) {
+                const vdt = (s.getAsObject() as unknown) as Vdt
+                vdtList.push(vdt)
+            }
+            s.free()
+            return vdtList
+        } else {
+            throw `map: ${map} & track: ${track}`
         }
-        return vdtList
     }
 
     async getVdt(date: string): Promise<Vdt> {
         const db = await this.db()
         const s = db.prepare('SELECT * from vdt WHERE date=:date')
         const vdt = (s.getAsObject({ ':date': date }) as unknown) as Vdt
+        s.free()
         return vdt
     }
 
@@ -198,6 +225,7 @@ export class DataAccess {
             record.name = this.replaceName(record.name)
             records.push(record)
         }
+        s.free()
         return records
     }
 
@@ -207,6 +235,8 @@ export class DataAccess {
         const prev = (s_prev.getAsObject({ ':date': date }) as unknown) as Vdt
         const s_next = db.prepare('SELECT * from vdt WHERE date>:date ORDER BY date ASC LIMIT 1')
         const next = (s_next.getAsObject({ ':date': date }) as unknown) as Vdt
+        s_prev.free()
+        s_next.free()
         return { prev: prev.date, next: next.date }
     }
 }

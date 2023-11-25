@@ -5,6 +5,7 @@ import { TrackSummary } from "./types"
 import { Column } from "primereact/column"
 import { FilterMatchMode } from "primereact/api"
 import { InputText } from "primereact/inputtext"
+import { Link } from "react-router-dom"
 
 interface TracksProps {
     dataAccess: DataAccess
@@ -42,15 +43,15 @@ export const Tracks: React.FC<TracksProps> = props => {
         <DataTable
             size='small'
             filters={filters}
-            globalFilterFields={['map']}
+            globalFilterFields={['track']}
             paginator rows={50}
             value={trackSummary}
         >
             <Column header='#' body={(_data, props) => props.rowIndex} />
             <Column sortable header="R"
                 body={x => <span title={`vdt repeats: ${x.repeats}`}>{x.repeats}</span>} />
-            <Column sortable field="map" header="Map" />
-            <Column sortable field="track" header="Track" />
+            <Column sortable body={x => <Link to={{ pathname: '/races', search: `map=${x.map}` }} >{x.map}</Link>} header="Map" />
+            <Column sortable body={x => <Link to={{ pathname: '/races', search: `track=${x.track}&map=${x.map}` }} >{x.track}</Link>} header="Track" />
             <Column sortable field="updates" header="Updates" />
         </DataTable>
     </div>

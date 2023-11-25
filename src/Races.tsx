@@ -5,18 +5,21 @@ import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { FilterMatchMode } from "primereact/api"
 import { Link } from "react-router-dom"
+import { useQuery } from "./useQuery"
 
-interface RaceIndexProps {
+interface RacesProps {
     dataAccess: DataAccess
 }
 
-
-export const RaceIndex: React.FC<RaceIndexProps> = (props) => {
+export const Races: React.FC<RacesProps> = (props) => {
     const [vdtList, setVdt] = useState<Vdt[]>([])
+    const query = useQuery()
+    const map = query.get('map') ?? undefined
+    const track = query.get('track') ?? undefined
 
     useEffect(() => {
-        props.dataAccess.getVdtList().then(x => setVdt(x))
-    }, [])
+        props.dataAccess.getVdtList(map, track).then(x => setVdt(x))
+    }, [map, track])
 
     const [filters] = useState({
         track: { value: null, matchMode: FilterMatchMode.CONTAINS },

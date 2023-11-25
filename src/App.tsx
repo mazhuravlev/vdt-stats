@@ -9,14 +9,15 @@ import {
     NavLink,
 } from "react-router-dom";
 import { Pilot } from './Pilot';
-import { PilotIndex } from './PilotIndex';
+import { Pilots } from './Pilots';
 import { Button } from 'primereact/button';
 import { DataAccess } from './DataAccess';
-import { RaceIndex } from './RaceIndex';
+import { Races } from './Races';
 import { Redirect } from './Redirect';
 import { Race } from './Race';
 import { Toaster } from 'react-hot-toast';
 import { Tracks } from './Tracks';
+import { Track } from './Track';
 
 function App(props: { dataAccess: DataAccess }) {
     return <HashRouter>
@@ -37,16 +38,19 @@ function App(props: { dataAccess: DataAccess }) {
                 element={<Race dataAccess={props.dataAccess} />} />
             <Route
                 path='/races'
-                element={<RaceIndex dataAccess={props.dataAccess} />} />
+                element={<Races dataAccess={props.dataAccess} />} />
             <Route
                 path='/pilot/:name'
                 element={<Pilot dataAccess={props.dataAccess} />} />
             <Route
                 path='/pilots'
-                element={<PilotIndex dataAccess={props.dataAccess} />} />
+                element={<Pilots dataAccess={props.dataAccess} />} />
             <Route
                 path='/tracks'
                 element={<Tracks dataAccess={props.dataAccess} />} />
+            <Route
+                path='/track/:track'
+                element={<Track dataAccess={props.dataAccess} />} />
             <Route
                 path='/'
                 element={<Redirect to='/races' />} />

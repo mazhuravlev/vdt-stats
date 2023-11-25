@@ -15,11 +15,11 @@ import { Calendar } from "primereact/calendar"
 import * as df from 'date-fns'
 import { Nullable } from "primereact/ts-helpers"
 
-interface IndexProps {
+interface PilotsProps {
     dataAccess: DataAccess
 }
 
-export const PilotIndex: React.FC<IndexProps> = (props) => {
+export const Pilots: React.FC<PilotsProps> = (props) => {
     const { dataAccess } = props
     const [pilots, setPilotData] = useState<PilotData[]>([])
     const [paginator, setPaginator] = useState(true)

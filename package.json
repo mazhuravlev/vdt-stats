@@ -26,7 +26,8 @@
     "react-router-dom": "^6.19.0",
     "recharts": "2.10.1",
     "rxjs": "^7.8.1",
-    "sql.js": "1.8.0"
+    "sql.js": "1.8.0",
+    "ts-pattern": "5.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

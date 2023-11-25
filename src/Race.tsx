@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Vdt, VdtRecord } from "./types"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
-import { assertDefined } from "./func"
+import { assertDefined, parseTrackName } from "./func"
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "primereact/button"
 import { useLocalStorage } from "@uidotdev/usehooks"
@@ -72,8 +72,14 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
                 <a href={vdt.url}>VDT ↗</a>
             </div>
         </div>
+        <div>
+            <Link to={{ pathname: '/races', search: `map=${parseTrackName(vdt.track).map}&track=${parseTrackName(vdt.track).track}` }}>
+                <Button>🗐 Track race list</Button>
+            </Link>
+        </div>
         <div className="my-2">
-            <span className="p-buttonset">
+            <span className="p-buttonset flex align-items-center">
+                <label className="mx-2">Chart bars size:</label>
                 {[15, 20, 30].map(x =>
                     <Button
                         key={x}
@@ -110,6 +116,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
                                 <div><b>{data.label}</b></div>
                                 <div>Place: {data.payload[0].payload.place}</div>
                                 <div>VD place: {data.payload[0].payload.globalPlace}</div>
+                                <div>Delta %: {data.payload[0].payload.deltaPercent}</div>
                             </div>
                         }
 
@@ -118,6 +125,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
                     <Legend />
                     <Line dataKey="place" name="VDT place" stroke="#8884d8" />
                     <Line dataKey="globalPlace" name="VD place" stroke="#82ca9d" />
+                    <Line dataKey="deltaPercent" name="Delta %" stroke="#dff154" />
                 </LineChart>
             </ResponsiveContainer>
         </div>}
