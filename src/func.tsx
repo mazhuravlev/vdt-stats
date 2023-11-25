@@ -20,7 +20,7 @@ export const findLongestStreak = (days: number[]): number => {
     return Math.max(...x.streaks)
 }
 
-export function assertDefined<T>(t: T | undefined | null): T {
-    if (t === undefined || t === null) throw 'assertDefined'
+export function assertDefined<T>(t: T | undefined | null, message?: any): T {
+    if (t === undefined || t === null) throw `assertDefined ${message}`
     return t
 }

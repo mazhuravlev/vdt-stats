@@ -30,6 +30,8 @@ export const RaceIndex: React.FC<RaceIndexProps> = (props) => {
             value={vdtList}
             filters={filters}
             filterDisplay='row'
+            sortField="date"
+            sortOrder={-1}
         >
             <Column sortable field="season" header="Season" />
             <Column sortable field="date" header="Date" />

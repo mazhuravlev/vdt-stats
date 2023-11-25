@@ -20,6 +20,7 @@ interface IndexProps {
 }
 
 export const PilotIndex: React.FC<IndexProps> = (props) => {
+    const { dataAccess } = props
     const [pilots, setPilotData] = useState<PilotData[]>([])
     const [paginator, setPaginator] = useState(true)
 
@@ -29,14 +30,14 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
     const [globalFilterValue, setGlobalFilterValue] = useState('')
 
     const getData = () =>
-        props.dataAccess.getPilots()
+        dataAccess.getPilots()
             .then((x: PilotData[]) => {
                 setPilotData(x)
             })
 
     const applySavePilots = () => {
         localStorage.setItem('sumPilots', sumPilots)
-        props.dataAccess.init().then(() => {
+        dataAccess.init().then(() => {
             getData()
         })
     }
@@ -45,7 +46,7 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
         const x = defaultPilotsReplacement;
         localStorage.setItem('sumPilots', x)
         setSumPilots(x)
-        props.dataAccess.init().then(() => {
+        dataAccess.init().then(() => {
             getData()
         })
     }
@@ -66,10 +67,11 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
         getData()
     }, [])
 
-    const setDate = (date: Nullable<Date>): void => {
-        if (!date) return
-        props.dataAccess.setSeasonStartDate(date).then(() => getData())
+    const setDate = (startDate: Nullable<Date>, endDate: Nullable<Date>): void => {
+        dataAccess.setSeason(startDate, endDate).then(() => getData())
     }
+
+    const parseVdtDate = (vdtDate: string | undefined): Date | undefined => vdtDate ? df.parse(vdtDate, vdtDateFormat, new Date()) : undefined
 
     return <div>
         <Accordion>
@@ -85,14 +87,36 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
                     <Button className="m-2" onClick={applySavePilots}>Save</Button>
                     <Button className="m-2" onClick={resetSumPilots}>Reset</Button>
                 </div>
-                <div className="m-2">
-                    <label htmlFor="cal_date" className="mx-2">Season start</label>
-                    <Calendar
-                        id="cal_date"
-                        view='month'
-                        dateFormat="MM yy"
-                        value={df.parse(props.dataAccess.seasonStartDate, vdtDateFormat, new Date())}
-                        onChange={(e) => setDate(e.value)} />
+            </AccordionTab>
+            <AccordionTab header="Season">
+                <div className="flex">
+                    <div className='m-2'>
+                        <label htmlFor="cal_date_end" className="mx-2">Season end</label>
+                        <Calendar
+                            id="cal_date_end"
+                            view='month'
+                            dateFormat="MM yy"
+                            value={dataAccess.seasonEndDate ? parseVdtDate(dataAccess.seasonEndDate) : undefined}
+                            onChange={(e) => setDate(
+                                parseVdtDate(dataAccess.seasonStartDate),
+                                e.value && df.lastDayOfMonth(e.value))} />
+                    </div>
+                    <div className='m-2'>
+                        <label htmlFor="cal_date" className="mx-2">Season start</label>
+                        <Calendar
+                            id="cal_date"
+                            view='month'
+                            dateFormat="MM yy"
+                            value={parseVdtDate(dataAccess.seasonStartDate)}
+                            onChange={(e) => setDate(e.value, parseVdtDate(dataAccess.seasonEndDate))} />
+                    </div   >
+                    <div className="flex">
+                        <Button
+                            onClick={() => setDate(undefined, undefined)}
+                            className='m-2' outlined severity='warning'>
+                            Clear
+                        </Button>
+                    </div>
                 </div>
             </AccordionTab>
         </Accordion>
@@ -113,6 +137,7 @@ export const PilotIndex: React.FC<IndexProps> = (props) => {
                 sortField='avg_delta'
                 sortOrder={1}
             >
+                <Column header="#" body={(_, props) => props.rowIndex + 1} />
                 <Column sortable field="name" header="Name" body={p => <Link to={`/pilot/${p.name}`}>{p.name}</Link>}></Column>
                 <Column sortable field="race_count" header="Race count"></Column>
                 <Column sortable field="avg_delta" header="Average delta %" body={x => x.avg_delta?.toFixed(2) ?? '—'}></Column>

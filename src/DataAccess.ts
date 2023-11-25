@@ -3,8 +3,10 @@ import { PilotData, PilotRecord, Vdt, VdtRecord, vdtDateFormat } from "./types";
 import { defaultPilotsReplacement } from "./defaultPilotsReplacement";
 import initSqlJs, { Database } from "sql.js";
 import * as df from 'date-fns'
+import { Nullable } from "primereact/ts-helpers";
 
 const SEASON_START_DATE_KEY = 'season_start_date'
+const SEASON_END_DATE_KEY = 'season_end_date'
 
 export class DataAccess {
     records: PilotRecord[] = []
@@ -13,7 +15,8 @@ export class DataAccess {
     private _db: Database | undefined;
     private _sqlPromise: Promise<unknown>;
     sumPilotsDict: [string, Set<string>][] = []
-    seasonStartDate: string = localStorage.getItem(SEASON_START_DATE_KEY) ?? '2019-01-01'
+    seasonStartDate: string | undefined = localStorage.getItem(SEASON_START_DATE_KEY) ?? undefined
+    seasonEndDate: string | undefined = localStorage.getItem(SEASON_END_DATE_KEY) ?? undefined
 
     constructor() {
         const sql = initSqlJs({
@@ -74,6 +77,8 @@ export class DataAccess {
                 l: -1,
                 vdtDate: vdtRecord.vdtDate,
             }
+            if (record.vdtDate <= (this.seasonStartDate ?? '2000-00-00')) continue
+            if (record.vdtDate >= (this.seasonEndDate ?? '3000-00-00')) continue
             this.records.push(record)
             if (this.pilotRecords.has(name)) {
                 this.pilotRecords.get(name)!.push(record)
@@ -90,7 +95,7 @@ export class DataAccess {
 
         this.pilotData = [...this.pilotRecords.keys()]
             .map(name => {
-                const records = this.pilotRecords.get(name)!
+                const records = assertDefined(this.pilotRecords.get(name))
                 const table = makeTable(records)
                 return {
                     name,
@@ -107,19 +112,29 @@ export class DataAccess {
         return Promise.resolve()
     }
 
-    setSeasonStartDate(date: Date) {
-        const s = df.format(date, 'yyyy-MM-dd')
-        localStorage.setItem(SEASON_START_DATE_KEY, s)
-        this.seasonStartDate = s
+    setSeason(startDate: Nullable<Date>, endDate: Nullable<Date>) {
+        const f = (x: Date) => df.format(x, 'yyyy-MM-dd')
+        if (startDate) {
+            localStorage.setItem(SEASON_START_DATE_KEY, f(startDate))
+        } else {
+            localStorage.removeItem(SEASON_START_DATE_KEY)
+        }
+        if (endDate) {
+            localStorage.setItem(SEASON_END_DATE_KEY, f(endDate))
+        } else {
+            localStorage.removeItem(SEASON_END_DATE_KEY)
+        }
+        this.seasonStartDate = startDate ? f(startDate) : undefined
+        this.seasonEndDate = endDate ? f(endDate) : undefined
         return this.init()
     }
 
     private calculateDelta(records: PilotRecord[]): number | undefined {
-        const filteredRecords = records.filter(x => x.vdtDate >= this.seasonStartDate)
-        if (filteredRecords.length === 0) return undefined
-        return filteredRecords
+        if (records.length === 0) return undefined
+        const delta = records
             .map(x => x.deltaPercent)
-            .reduce(sum, 0) / filteredRecords.length;
+            .reduce(sum, 0) / records.length;
+        return delta
     }
 
     async getVdtList(): Promise<Vdt[]> {
@@ -149,7 +164,8 @@ export class DataAccess {
     }
 
     async getPilotTable(name: string): Promise<number[]> {
-        return Promise.resolve(this.pilotData.find(x => x.name === name)!.table)
+        const pd = this.pilotData.find(x => x.name === name)
+        return Promise.resolve(pd ? pd.table : [])
     }
 
     async getPilotRecords(name: string): Promise<PilotRecord[]> {

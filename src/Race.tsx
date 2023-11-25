@@ -37,7 +37,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
             .then(x => {
                 const map = new Map(x[2].map(pd => [pd.name, pd]))
                 setData({
-                    records: x[0].map(r => ({ ...r, avgDelta: assertDefined(map.get(r.name)?.avg_delta) })),
+                    records: x[0].map(r => ({ ...r, avgDelta: map.get(r.name)?.avg_delta ?? -1 })),
                     vdt: x[1],
                     navigation: x[3]
                 })
@@ -84,7 +84,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
                     />)}
             </span>
         </div>
-        <div style={{ width: '100%', height: records.length * sizeC }}>
+        {records.length > 1 && <div style={{ width: '100%', height: records.length * sizeC + 100 }}>
             <ResponsiveContainer>
                 <BarChart layout='vertical' data={records}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -96,7 +96,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
                     <Bar name='Avg delta %' dataKey="avgDelta" fill="#504e81" />
                 </BarChart>
             </ResponsiveContainer>
-        </div>
+        </div>}
         <DataTable size='small' value={records}>
             <Column field='place' header='VDT place' />
             <Column field='globalPlace' header='VD place' />
