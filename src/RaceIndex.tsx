@@ -33,9 +33,9 @@ export const RaceIndex: React.FC<RaceIndexProps> = (props) => {
             sortField="date"
             sortOrder={-1}
         >
-            <Column sortable field="season" header="Season" />
+            <Column sortable field="season" header="S" body={x => <span title={`Season ${x.season}`}>{x.season}</span>} />
             <Column sortable field="date" header="Date" />
-            <Column header="VDT"
+            <Column header="vdt"
                 body={x => <a href={x.url}>↗</a>} />
             <Column sortable filter={true} filterField='track' header="Track"
                 body={x => <Link to={`/race/${x.date}`}>{x.track}</Link>} />

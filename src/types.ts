@@ -42,3 +42,10 @@ export interface VdtRecord {
 }
 
 export const vdtDateFormat = 'yyyy-MM-dd'
+
+export interface TrackSummary {
+    repeats: number
+    map: string
+    track: string
+    updates: number
+}

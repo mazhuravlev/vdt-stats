@@ -16,6 +16,7 @@ import { RaceIndex } from './RaceIndex';
 import { Redirect } from './Redirect';
 import { Race } from './Race';
 import { Toaster } from 'react-hot-toast';
+import { Tracks } from './Tracks';
 
 function App(props: { dataAccess: DataAccess }) {
     return <HashRouter>
@@ -25,6 +26,9 @@ function App(props: { dataAccess: DataAccess }) {
             </NavLink>
             <NavLink to='/pilots' className='mx-2'>
                 {props => <Button severity={props.isActive ? undefined : 'secondary'}>Pilots</Button>}
+            </NavLink>
+            <NavLink to='/tracks' className='mx-2'>
+                {props => <Button severity={props.isActive ? undefined : 'secondary'}>Tracks</Button>}
             </NavLink>
         </div>
         <Routes>
@@ -40,6 +44,9 @@ function App(props: { dataAccess: DataAccess }) {
             <Route
                 path='/pilots'
                 element={<PilotIndex dataAccess={props.dataAccess} />} />
+            <Route
+                path='/tracks'
+                element={<Tracks dataAccess={props.dataAccess} />} />
             <Route
                 path='/'
                 element={<Redirect to='/races' />} />

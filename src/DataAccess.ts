@@ -1,5 +1,5 @@
 import { assertDefined, findLongestStreak, sum } from "./func";
-import { PilotData, PilotRecord, Vdt, VdtRecord, vdtDateFormat } from "./types";
+import { PilotData, PilotRecord, TrackSummary, Vdt, VdtRecord, vdtDateFormat } from "./types";
 import { defaultPilotsReplacement } from "./defaultPilotsReplacement";
 import initSqlJs, { Database } from "sql.js";
 import * as df from 'date-fns'
@@ -33,6 +33,23 @@ export class DataAccess {
     async db(): Promise<Database> {
         await this._sqlPromise
         return assertDefined(this._db)
+    }
+
+    async getTrackSummary(): Promise<TrackSummary[]> {
+        const db = await this.db()
+        const q = db.exec(`select count(track) as cnt, track, sum(updates) as updates 
+        from vdt 
+        group by track 
+        order by cnt desc, updates desc`)
+        return q[0].values.map((x): TrackSummary => {
+            const [map, track] = (x[1] as string).split('/').map(x => x.trim())
+            return ({
+                repeats: x[0] as number,
+                map,
+                track,
+                updates: x[2] as number,
+            })
+        })
     }
 
     private replaceName(name: string) {

@@ -5,7 +5,7 @@ import { Vdt, VdtRecord } from "./types"
 import { DataTable } from "primereact/datatable"
 import { Column } from "primereact/column"
 import { assertDefined } from "./func"
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { Button } from "primereact/button"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import toast from "react-hot-toast"
@@ -86,7 +86,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
         </div>
         {records.length > 1 && <div style={{ width: '100%', height: records.length * sizeC + 100 }}>
             <ResponsiveContainer>
-                <BarChart layout='vertical' data={records}>
+                <BarChart syncId='race' layout='vertical' data={records}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type='number' dataKey='deltaPercent' />
                     <YAxis width={150} type='category' dataKey='name' />
@@ -95,6 +95,30 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
                     <Bar name="Delta %" dataKey="deltaPercent" fill="#82ca9d" />
                     <Bar name='Avg delta %' dataKey="avgDelta" fill="#504e81" />
                 </BarChart>
+            </ResponsiveContainer>
+        </div>}
+        {records.length > 1 && <div className="my-2" style={{ width: '100%', height: 300 }}>
+            <ResponsiveContainer>
+                <LineChart syncId='race' data={records}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip content={data => {
+                        if (data.active && data.payload && data.payload[0]) {
+                            return <div className="custom-tooltip">
+                                <div><b>{data.label}</b></div>
+                                <div>Place: {data.payload[0].payload.place}</div>
+                                <div>VD place: {data.payload[0].payload.globalPlace}</div>
+                            </div>
+                        }
+
+                        return null
+                    }} />
+                    <Legend />
+                    <Line dataKey="place" name="VDT place" stroke="#8884d8" />
+                    <Line dataKey="globalPlace" name="VD place" stroke="#82ca9d" />
+                </LineChart>
             </ResponsiveContainer>
         </div>}
         <DataTable size='small' value={records}>
