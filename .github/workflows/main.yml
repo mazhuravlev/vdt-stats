@@ -38,7 +38,7 @@ jobs:
         with:
           repository: pages
           commit_message: Update vdt.db
-          branch: vdt-db
+          branch: gh-pages
           file_pattern: 'data/vdt.db'
           status_options: '--untracked-files=no'
           add_options: '-u'
