@@ -16,22 +16,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          path: app
+          path: /app
       - uses: actions/checkout@v3
         with:
           ref: gh-pages
-          path: pages
+          path: /pages
       - name: work
         run: |
-          cp pages/data/vdt.db app/public/data/vdt.db
-          cd app/loader
+          ls /
+          cp /pages/data/vdt.db /app/public/data/vdt.db
+          cd /app/loader
           npm ci
           npm run build
           npm run work
-          cp app/public/data/vdt.db pages/data/vdt.db
+          cp /app/public/data/vdt.db /pages/data/vdt.db
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          repository: pages
+          repository: /pages
           commit_message: Update vdt.db
           branch: gh-pages
           file_pattern: 'data/vdt.db'
