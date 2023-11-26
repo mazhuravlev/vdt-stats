@@ -18,14 +18,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: app
       - name: work
         run: |
-          cp public/data/vdt.db loader
-          cd loader
+          cd app/loader
           npm ci
           npm run build
           npm run work
-      - uses: actions/upload-artifact@v3
+      - uses: actions/checkout@v3
         with:
-          name: vdt.db
-          path: loader/vdt.db
+          path: pages
+      - name: copy db
+        run: |
+          ls
+          cp app/public/data/vdt.db pages/data/vdt.db
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          repository: pages
+          commit_message: Update vdt.db
+          branch: vdt-db
+          file_pattern: 'data/vdt.db'
+          status_options: '--untracked-files=no'
+          add_options: '-u'
+          push_options: '--force'

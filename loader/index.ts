@@ -66,7 +66,7 @@ export class VdtRecord {
     vdt: Vdt
 }
 
-const dbFile = 'vdt.db'
+const dbFile = '../public/data/vdt.db'
 const vdtBaseUrl = 'https://vdt.tg/';
 console.log('start..');
 
