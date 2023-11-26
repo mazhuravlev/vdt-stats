@@ -17,4 +17,7 @@ jobs:
         run: |
           cd loader
           npm ci
-          npm start
+          ls
+          npm run build
+          ls dist
+          npm run work

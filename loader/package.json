@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "work": "node dist/index.js",
     "start": "tsc -p tsconfig.json & node dist/index.js"
   },
   "author": "",
