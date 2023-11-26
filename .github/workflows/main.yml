@@ -29,6 +29,8 @@ jobs:
           npm run build
           npm run work
           cp ${{github.workspace}}/app/public/data/vdt.db ${{github.workspace}}/pages/data/vdt.db
+          cd ${{github.workspace}}/pages/data/
+          zip vdt.zip vdt.db
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           repository: pages

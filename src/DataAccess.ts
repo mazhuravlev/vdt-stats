@@ -1,9 +1,10 @@
-import { assertDefined, assertString, assertTrue, findLongestStreak, parseTrackName, sum } from "./func";
-import { PilotData, PilotRecord, TrackSummary, Vdt, VdtRecord, vdtDateFormat } from "./types";
-import { defaultPilotsReplacement } from "./defaultPilotsReplacement";
-import initSqlJs, { Database } from "sql.js";
+import { assertDefined, assertString, assertTrue, findLongestStreak, parseTrackName, sum } from "./func"
+import { PilotData, PilotRecord, TrackSummary, Vdt, VdtRecord, vdtDateFormat } from "./types"
+import { defaultPilotsReplacement } from "./defaultPilotsReplacement"
+import initSqlJs, { Database } from "sql.js"
 import * as df from 'date-fns'
-import { Nullable } from "primereact/ts-helpers";
+import { Nullable } from "primereact/ts-helpers"
+import * as zip from "@zip.js/zip.js"
 
 const SEASON_START_DATE_KEY = 'season_start_date'
 const SEASON_END_DATE_KEY = 'season_end_date'
@@ -22,18 +23,23 @@ export class DataAccess {
         const sql = initSqlJs({
             locateFile: file => `${import.meta.env.BASE_URL}data/${file}`
         })
-        const dbUrl = `${import.meta.env.BASE_URL}data/vdt.db`;
-        const data = fetch(dbUrl).then(res => res.arrayBuffer())
-        const sqlPromise = Promise.all([sql, data])
-        sqlPromise.then(([sql, data]) => {
-            this._db = new sql.Database(new Uint8Array(data))
+        const dbUrl = `${import.meta.env.BASE_URL}data/vdt.zip`;
+        const data = fetch(dbUrl).then(res => res.blob())
+        this._sqlPromise = Promise.all([sql, data]).then(async ([sql, blob]) => {
+            const zipReader = new zip.ZipReader(new zip.BlobReader(blob));
+            const entries = await zipReader.getEntries()
+            const dbEntry = assertDefined(entries.find(x => x.filename === 'vdt.db'))
+            if (!dbEntry.getData) throw '!dbEntry.getData'
+            const writer = new zip.Uint8ArrayWriter()
+            await dbEntry.getData(writer)
+            const data = await writer.getData()
+            this._db = new sql.Database(data)
         })
-        this._sqlPromise = sqlPromise
     }
 
     async db(): Promise<Database> {
         await this._sqlPromise
-        return assertDefined(this._db)
+        return assertDefined(this._db, 'this._db')
     }
 
     async getTrackSummary(): Promise<TrackSummary[]> {
