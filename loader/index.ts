@@ -1,7 +1,6 @@
 import { JSDOM } from 'jsdom'
 import * as df from 'date-fns'
 import { DataSource, ManyToOne, Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
-import * as ftp from "basic-ftp"
 
 @Entity()
 export class Vdt {
@@ -160,22 +159,6 @@ console.log('start..');
             setTimeout(resolve, 50)
         )
     }
-
-    const client = new ftp.Client()
-    client.ftp.verbose = false
-    try {
-        await client.access({
-            host: process.env.FTP_HOST,
-            user: process.env.FTP_USER,
-            password: process.env.FTP_PASSWORD,
-        })
-        console.log(await client.list())
-        await client.uploadFrom(dbFile, 'vdt.db')
-    }
-    catch (err) {
-        console.log(err)
-    }
-    client.close()
 })().then(() => {
     console.log('done..')
 })

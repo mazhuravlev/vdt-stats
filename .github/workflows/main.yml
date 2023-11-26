@@ -8,11 +8,6 @@ on:
 
   workflow_dispatch:
 
-env:
-  FTP_HOST: ${{vars.FTP_HOST}}
-  FTP_USER: ${{vars.FTP_USER}}
-  FTP_PASSWORD: ${{secrets.FTP_PASSWORD}}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,18 +17,18 @@ jobs:
       - uses: actions/checkout@v3
         with:
           path: app
-      - name: work
-        run: |
-          cd app/loader
-          npm ci
-          npm run build
-          npm run work
       - uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: pages
-      - name: copy db
-        run: cp app/public/data/vdt.db pages/data/vdt.db
+      - name: work
+        run: |
+          cp pages/data/vdt.db app/public/data/vdt.db
+          cd app/loader
+          npm ci
+          npm run build
+          npm run work
+          cp app/public/data/vdt.db pages/data/vdt.db
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           repository: pages

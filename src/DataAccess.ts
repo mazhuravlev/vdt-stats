@@ -22,7 +22,7 @@ export class DataAccess {
         const sql = initSqlJs({
             locateFile: file => `${import.meta.env.BASE_URL}data/${file}`
         })
-        const dbUrl = 'https://vdt.mazhuravlev.ru/vdt.db' //`${import.meta.env.BASE_URL}data/vdt.db`;
+        const dbUrl = `${import.meta.env.BASE_URL}data/vdt.db`;
         const data = fetch(dbUrl).then(res => res.arrayBuffer())
         const sqlPromise = Promise.all([sql, data])
         sqlPromise.then(([sql, data]) => {
