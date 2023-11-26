@@ -1,6 +1,7 @@
 import { JSDOM } from 'jsdom'
 import * as df from 'date-fns'
 import { DataSource, ManyToOne, Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
+import * as ftp from "basic-ftp"
 
 @Entity()
 export class Vdt {
@@ -65,13 +66,14 @@ export class VdtRecord {
     vdt: Vdt
 }
 
+const dbFile = 'vdt.db'
 const vdtBaseUrl = 'https://vdt.tg/';
 console.log('start..');
 
 (async () => {
     const dataSource = new DataSource({
         type: 'sqlite',
-        database: 'vdt.db',
+        database: dbFile,
         entities: [Vdt, VdtRecord],
         synchronize: true,
     })
@@ -96,6 +98,22 @@ console.log('start..');
         }
     })
     console.log(`Received ${_vdtList.length} VDT`)
+
+    const client = new ftp.Client()
+    client.ftp.verbose = true
+    try {
+        await client.access({
+            host: process.env.FTP_HOST,
+            user: process.env.FTP_USER,
+            password: process.env.FTP_PASSWORD,
+        })
+        console.log(await client.list())
+        await client.uploadFrom(dbFile, 'vdt.db')
+    }
+    catch (err) {
+        console.log(err)
+    }
+    client.close()
 })().then(() => {
     console.log('done..')
 })
