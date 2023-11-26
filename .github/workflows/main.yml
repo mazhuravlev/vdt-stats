@@ -16,6 +16,8 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
         with:
@@ -31,9 +33,7 @@ jobs:
           ref: gh-pages
           path: pages
       - name: copy db
-        run: |
-          ls
-          cp app/public/data/vdt.db pages/data/vdt.db
+        run: cp app/public/data/vdt.db pages/data/vdt.db
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           repository: pages

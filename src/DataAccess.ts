@@ -82,7 +82,7 @@ export class DataAccess {
         this.pilotData = []
 
         const db = await this.db()
-        const s = db.prepare('SELECT * from vdt_record')
+        const s = db.prepare('SELECT * from vdt_record ORDER BY vdtDate DESC')
         while (s.step()) {
             const vdtRecord = (s.getAsObject() as unknown) as VdtRecord
             const name = this.replaceName(vdtRecord.name)
