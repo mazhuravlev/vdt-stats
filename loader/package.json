@@ -1,0 +1,17 @@
+{
+  "name": "loader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc -p tsconfig.json & node dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jsdom": "^21.1.6",
+    "jsdom": "^22.1.0",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17"
+  }
+}
