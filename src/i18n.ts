@@ -11,7 +11,6 @@ i18n.on('languageChanged', lng => {
         case 'en':
         case 'ru':
             locale(lng)
-            console.log(`locale ${lng}`)
             break
         default: throw `invalid locale: ${lng}`
     }
@@ -19,14 +18,22 @@ i18n.on('languageChanged', lng => {
 
 i18n.on('initialized', options => {
     const lng = i18n.resolvedLanguage ?? options.lng ?? 'en'
-    console.log(`locale ${lng}`)
     locale(lng)
 })
+
+const convertDetectedLanguage = (lng: string): string => {
+    if (lng.startsWith('en')) return 'en'
+    if (lng.startsWith('ru')) return 'ru'
+    return 'en'
+}
 
 i18n
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
+        detection: {
+            convertDetectedLanguage
+        },
         debug: true,
         fallbackLng: 'en',
         interpolation: {
