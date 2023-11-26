@@ -154,7 +154,7 @@ console.log('start..');
             record.vdt = vdt
             return record
         })
-        console.log(`save ${vdt.date} ${((i / vdtList.length) * 100).toFixed(1)}% (${i})`)
+        console.log(`save (records: ${records.length}) ${vdt.date} ${((i / vdtList.length) * 100).toFixed(1)}% (${i + 1})`)
         dataSource.manager.save(records)
         await new Promise(resolve =>
             setTimeout(resolve, 50)
@@ -162,7 +162,7 @@ console.log('start..');
     }
 
     const client = new ftp.Client()
-    client.ftp.verbose = true
+    client.ftp.verbose = false
     try {
         await client.access({
             host: process.env.FTP_HOST,
