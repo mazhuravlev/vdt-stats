@@ -8,15 +8,17 @@ import { Slider } from 'primereact/slider'
 import { useDebounce } from './useDebounce'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import { Button } from 'primereact/button'
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DataAccess } from './DataAccess';
 import * as df from 'date-fns'
+import { useTranslation } from 'react-i18next';
 
 interface PilotProps {
   dataAccess: DataAccess
 }
 
 export const Pilot: React.FC<PilotProps> = (props) => {
+  const { t } = useTranslation()
   let { name } = useParams()
   if (!name) throw 'name'
   const navigate = useNavigate()
@@ -95,19 +97,25 @@ export const Pilot: React.FC<PilotProps> = (props) => {
 
   return (
     <PrimeReactProvider>
-      <AutoComplete
-        value={name_ui}
-        suggestions={autocompletePilotNames}
-        completeMethod={search}
-        style={{ marginBottom: '12px' }}
-        onChange={(e) => setName_ui(e.value)}
-        dropdown />
+      <div className='flex'>
+        <AutoComplete
+          value={name_ui}
+          suggestions={autocompletePilotNames}
+          completeMethod={search}
+          style={{ marginBottom: '12px' }}
+          onChange={(e) => setName_ui(e.value)}
+          dropdown />
+        {pilot &&
+          <Link to={{ pathname: '/races', search: `pilot=${pilot.name}` }}>
+            <Button className='mx-2'>{t('pilot.raceList')}</Button>
+          </Link>}
+      </div>
       <div style={{ width: '100vw', maxWidth: 1280 }}>
         {pilot && <table className='tt' cellSpacing={0}><tbody>
-          <tr><td>Количество гонок</td><td>{pilot.race_count}</td></tr>
-          <tr><td>Количество обновлений</td><td>{pilot.total_updates}</td></tr>
-          <tr><td>Средняя дельта % за сезон</td><td>{pilot.avg_delta?.toFixed(2) ?? '—'}</td></tr>
-          <tr><td>Макс. непрерывных дней гонок</td><td>{pilot.longest_streak}</td></tr>
+          <tr><td>{t('pilot.raceCount')}</td><td>{pilot.race_count}</td></tr>
+          <tr><td>{t('pilot.updateCount')}</td><td>{pilot.total_updates}</td></tr>
+          <tr><td>{t('pilot.avgSeasonDelta')}</td><td>{pilot.avg_delta?.toFixed(2) ?? '—'}</td></tr>
+          <tr><td>{t('pilot.longestStreak')}</td><td>{pilot.longest_streak}</td></tr>
         </tbody></table>}
         <div style={{ width: '100%', height: 80 }}>
           <ResponsiveContainer>
@@ -126,15 +134,15 @@ export const Pilot: React.FC<PilotProps> = (props) => {
           <div>
             <div className='flex'>
               <div className='flex-initial m-2'>
-                <Button onClick={() => setsShowScatter(!showScatter)}>{showScatter ? 'Скрыть' : 'Показать'} точки</Button>
+                <Button onClick={() => setsShowScatter(!showScatter)}>{showScatter ? t('pilot.hideScatter') : t('pilot.showScatter')}</Button>
               </div>
-              <div className='flex-initial m-2'>Сглаживание {f_ui}</div>
+              <div className='flex-initial m-2'>{t('pilot.smoothing')} {f_ui}</div>
               <div className='flex-initial m-2' style={{ width: 300 }}>
                 <Slider title='Сглаживание' style={{ marginTop: 12, marginBottom: 12 }}
                   value={f_ui} onChange={(e) => setF_ui(Number(e.value))} min={0.01} max={1} step={0.01} />
               </div>
               {selectedDates.length === 2 && <div className='flex-initial m-2'>
-                Разница в днях: {Math.abs(df.differenceInCalendarDays(
+                {t('pilot.daysDifference')}: {Math.abs(df.differenceInCalendarDays(
                   df.parse(selectedDates[0].date, vdtDateFormat, new Date()),
                   df.parse(selectedDates[1].date, vdtDateFormat, new Date())))}
               </div>}

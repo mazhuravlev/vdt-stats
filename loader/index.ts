@@ -99,7 +99,7 @@ console.log('start..');
     console.log(`Received ${_vdtList.length} VDT`)
 
 
-    const today = df.format(new Date(), 'yyyy-MM-dd')
+    const today = df.format(df.subDays(new Date(), 1), 'yyyy-MM-dd')
     const recordDeleteResult = await dataSource
         .getRepository(VdtRecord)
         .createQueryBuilder('vdtRecord')

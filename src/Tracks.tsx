@@ -6,12 +6,15 @@ import { Column } from "primereact/column"
 import { FilterMatchMode } from "primereact/api"
 import { InputText } from "primereact/inputtext"
 import { Link } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 interface TracksProps {
     dataAccess: DataAccess
 }
 
 export const Tracks: React.FC<TracksProps> = props => {
+    const { t } = useTranslation()
+
     const [trackSummary, setTrackSummary] = useState<TrackSummary[]>()
 
     const [filters, setFilters] = useState({
@@ -37,7 +40,7 @@ export const Tracks: React.FC<TracksProps> = props => {
         <div className="flex justify-content-start m-2">
             <span className="p-input-icon-left">
                 <i className="pi pi-search" />
-                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search" />
+                <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder={t('search')} />
             </span>
         </div>
         <DataTable
@@ -48,11 +51,11 @@ export const Tracks: React.FC<TracksProps> = props => {
             value={trackSummary}
         >
             <Column header='#' body={(_data, props) => props.rowIndex} />
-            <Column sortable header="R"
+            <Column sortable header={t('tracks.repeats')}
                 body={x => <span title={`vdt repeats: ${x.repeats}`}>{x.repeats}</span>} />
-            <Column sortable body={x => <Link to={{ pathname: '/races', search: `map=${x.map}` }} >{x.map}</Link>} header="Map" />
-            <Column sortable body={x => <Link to={{ pathname: '/races', search: `track=${x.track}&map=${x.map}` }} >{x.track}</Link>} header="Track" />
-            <Column sortable field="updates" header="Updates" />
+            <Column sortable body={x => <Link to={{ pathname: '/races', search: `map=${x.map}` }} >{x.map}</Link>} header={t('tracks.map')} />
+            <Column sortable body={x => <Link to={{ pathname: '/races', search: `track=${x.track}&map=${x.map}` }} >{x.track}</Link>} header={t('tracks.track')} />
+            <Column sortable field="updates" header={t('tracks.updates')} />
         </DataTable>
     </div>
 }

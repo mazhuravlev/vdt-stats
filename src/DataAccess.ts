@@ -162,9 +162,19 @@ export class DataAccess {
         return delta
     }
 
-    async getVdtList(map?: string, track?: string): Promise<Vdt[]> {
+    async getVdtList(map?: string, track?: string, pilot?: string): Promise<Vdt[]> {
         const db = await this.db()
-        if (!map && !track) {
+        if (pilot) {
+            const s = db.prepare(`SELECT * FROM vdt_record LEFT JOIN vdt ON vdt_record.vdtDate = vdt.date WHERE name=:name`)
+            s.bind({ ':name': pilot })
+            const vdtList: Vdt[] = []
+            while (s.step()) {
+                const vdt = (s.getAsObject() as unknown) as Vdt
+                vdtList.push(vdt)
+            }
+            s.free()
+            return vdtList
+        } else if (!map && !track) {
             const s = db.prepare('SELECT * from vdt')
             const vdtList: Vdt[] = []
             while (s.step()) {

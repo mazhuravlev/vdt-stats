@@ -14,12 +14,16 @@ import { InputText } from "primereact/inputtext"
 import { Calendar } from "primereact/calendar"
 import * as df from 'date-fns'
 import { Nullable } from "primereact/ts-helpers"
+import { useTranslation } from "react-i18next"
+import i18n from "./i18n"
 
 interface PilotsProps {
     dataAccess: DataAccess
 }
 
 export const Pilots: React.FC<PilotsProps> = (props) => {
+    const { t } = useTranslation()
+
     const { dataAccess } = props
     const [pilots, setPilotData] = useState<PilotData[]>([])
     const [paginator, setPaginator] = useState(true)
@@ -75,7 +79,7 @@ export const Pilots: React.FC<PilotsProps> = (props) => {
 
     return <div>
         <Accordion>
-            <AccordionTab header="Settings">
+            <AccordionTab header={t('settings')}>
                 <div className="m-2">
                     <div className="flex align-items-center">
                         <Checkbox onChange={() => setPaginator(!paginator)} checked={paginator} />
@@ -88,43 +92,43 @@ export const Pilots: React.FC<PilotsProps> = (props) => {
                     <Button className="m-2" onClick={resetSumPilots}>Reset</Button>
                 </div>
             </AccordionTab>
-            <AccordionTab header="Season">
-                <div className="flex">
-                    <div className='m-2'>
-                        <label htmlFor="cal_date_end" className="mx-2">Season end</label>
-                        <Calendar
-                            id="cal_date_end"
-                            view='month'
-                            dateFormat="MM yy"
-                            value={dataAccess.seasonEndDate ? parseVdtDate(dataAccess.seasonEndDate) : undefined}
-                            onChange={(e) => setDate(
-                                parseVdtDate(dataAccess.seasonStartDate),
-                                e.value && df.lastDayOfMonth(e.value))} />
-                    </div>
-                    <div className='m-2'>
-                        <label htmlFor="cal_date" className="mx-2">Season start</label>
-                        <Calendar
-                            id="cal_date"
-                            view='month'
-                            dateFormat="MM yy"
-                            value={parseVdtDate(dataAccess.seasonStartDate)}
-                            onChange={(e) => setDate(e.value, parseVdtDate(dataAccess.seasonEndDate))} />
-                    </div   >
-                    <div className="flex">
-                        <Button
-                            onClick={() => setDate(undefined, undefined)}
-                            className='m-2' outlined severity='warning'>
-                            Clear
-                        </Button>
-                    </div>
-                </div>
-            </AccordionTab>
         </Accordion>
+        <div className="flex">
+            <div className='m-2'>
+                <label htmlFor="cal_date_end" className="mx-2">{t('pilots.seasonEnd')}</label>
+                <Calendar
+                    locale='ru'
+                    id="cal_date_end"
+                    view='month'
+                    dateFormat="MM yy"
+                    value={dataAccess.seasonEndDate ? parseVdtDate(dataAccess.seasonEndDate) : undefined}
+                    onChange={(e) => setDate(
+                        parseVdtDate(dataAccess.seasonStartDate),
+                        e.value && df.lastDayOfMonth(e.value))} />
+            </div>
+            <div className='m-2'>
+                <label htmlFor="cal_date" className="mx-2">{t('pilots.seasonStart')}</label>
+                <Calendar
+                    locale={i18n.resolvedLanguage}
+                    id="cal_date"
+                    view='month'
+                    dateFormat="MM yy"
+                    value={parseVdtDate(dataAccess.seasonStartDate)}
+                    onChange={(e) => setDate(e.value, parseVdtDate(dataAccess.seasonEndDate))} />
+            </div   >
+            <div className="flex">
+                <Button
+                    onClick={() => setDate(undefined, undefined)}
+                    className='m-2' outlined severity='warning'>
+                    {t('clear')}
+                </Button>
+            </div>
+        </div>
         <div>
             <div className="flex justify-content-start m-2">
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Search" />
+                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder={t('search')} />
                 </span>
             </div>
             <DataTable
@@ -138,11 +142,13 @@ export const Pilots: React.FC<PilotsProps> = (props) => {
                 sortOrder={1}
             >
                 <Column header="#" body={(_, props) => props.rowIndex + 1} />
-                <Column sortable field="name" header="Name" body={p => <Link to={`/pilot/${p.name}`}>{p.name}</Link>}></Column>
-                <Column sortable field="race_count" header="Race count"></Column>
-                <Column sortable field="avg_delta" header="Average delta %" body={x => x.avg_delta?.toFixed(2) ?? '—'}></Column>
-                <Column sortable field="total_updates" header="Total updates"></Column>
-                <Column sortable field="longest_streak" header="Longest streak"></Column>
+                <Column sortable field="name" header={t('pilots.name')} body={p => <Link to={`/pilot/${p.name}`}>{p.name}</Link>} />
+                <Column sortable field="name" header={t('pilots.races')}
+                    body={p => <Link to={{ pathname: '/races', search: `pilot=${p.name}` }}>↗</Link>} />
+                <Column sortable field="race_count" header={t('pilots.raceCount')} />
+                <Column sortable field="avg_delta" header={t('pilots.avgDelta')} body={x => x.avg_delta?.toFixed(2) ?? '—'} />
+                <Column sortable field="total_updates" header={t('pilots.totalUpdates')} />
+                <Column sortable field="longest_streak" header={t('pilots.longestStreak')} />
             </DataTable>
         </div>
     </div>

@@ -9,6 +9,7 @@ import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContai
 import { Button } from "primereact/button"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import toast from "react-hot-toast"
+import { useTranslation } from "react-i18next"
 
 interface RaceIndexProps {
     dataAccess: DataAccess
@@ -25,6 +26,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
     const date = assertDefined(params.date)
     const [data, setData] = useState<DataState>()
     const [sizeC, setSizeC] = useLocalStorage('race_sizeC', 20)
+    const { t } = useTranslation()
 
     useEffect(() => {
         const { dataAccess } = props
@@ -49,7 +51,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
     const onTrackClick = async (vdt: Vdt) => {
         const text = vdt.track.split('/')[1].trim()
         await navigator.clipboard.writeText(text)
-        toast('Track name copied to clipboard')
+        toast(t('race.trackNameCopied'))
     }
 
     return <div className="my-4">
@@ -74,12 +76,12 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
         </div>
         <div>
             <Link to={{ pathname: '/races', search: `map=${parseTrackName(vdt.track).map}&track=${parseTrackName(vdt.track).track}` }}>
-                <Button>🗐 Track race list</Button>
+                <Button>{t('race.trackRaceList')}</Button>
             </Link>
         </div>
         <div className="my-2">
             <span className="p-buttonset flex align-items-center">
-                <label className="mx-2">Chart bars size:</label>
+                <label className="mx-2">{t('race.chartBarsSize')}:</label>
                 {[15, 20, 30].map(x =>
                     <Button
                         key={x}

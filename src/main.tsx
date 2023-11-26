@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { DataAccess } from './DataAccess.ts'
+import './i18n.ts'
 
 const dataAccess = new DataAccess()
 dataAccess.init()
