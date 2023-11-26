@@ -12,16 +12,12 @@
     "deploy": "gh-pages -d vdt-stats"
   },
   "dependencies": {
-    "@actions/core": "^1.10.1",
-    "@actions/github": "^6.0.0",
     "@stdlib/stats-lowess": "^0.1.0",
-    "@types/jsdom": "^21.1.6",
     "@types/sql.js": "^1.4.9",
     "@uidotdev/usehooks": "^2.4.1",
     "commons-math-interpolation": "github:chdh/commons-math-interpolation",
     "date-fns": "^2.30.0",
     "gh-pages": "^6.1.0",
-    "jsdom": "^22.1.0",
     "primeflex": "^3.3.1",
     "primereact": "^10.1.1",
     "react": "^18.2.0",
@@ -31,9 +27,7 @@
     "recharts": "2.10.1",
     "rxjs": "^7.8.1",
     "sql.js": "1.8.0",
-    "sqlite3": "^5.1.6",
-    "ts-pattern": "5.0.5",
-    "typeorm": "^0.3.17"
+    "ts-pattern": "5.0.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
