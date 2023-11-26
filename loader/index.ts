@@ -99,6 +99,68 @@ console.log('start..');
     })
     console.log(`Received ${_vdtList.length} VDT`)
 
+
+    const today = df.format(new Date(), 'yyyy-MM-dd')
+    const recordDeleteResult = await dataSource
+        .getRepository(VdtRecord)
+        .createQueryBuilder('vdtRecord')
+        .delete()
+        .from(VdtRecord)
+        .where("vdtDate = :today", { today })
+        .execute()
+    console.log(`deleted today's vdt records: ${recordDeleteResult.affected ?? 0}`)
+    const deleteResult = await dataSource
+        .getRepository(Vdt)
+        .createQueryBuilder('vdt')
+        .delete()
+        .from(Vdt)
+        .where("date = :today", { today })
+        .execute()
+    console.log(`deleted today's vdt: ${deleteResult.affected ?? 0}`)
+
+    const vdts = await dataSource
+        .getRepository(Vdt)
+        .createQueryBuilder('vdt')
+        .select('date')
+        .getRawMany<{ date: string }>()
+
+    const dateSet = new Set(vdts.map(x => x.date))
+
+    const vdtList = _vdtList.filter(x => !dateSet.has(x.date))
+    console.log(`got ${_vdtList.length} vdt, ${vdtList.length} new`)
+    dataSource.manager.save([...vdtList])
+
+
+    for (let i = 0; i < vdtList.length; i++) {
+        const vdt = vdtList[i];
+        const res = await fetch(vdt.url).then(res => res.text())
+        const dom = new JSDOM(res, { url: vdtBaseUrl })
+        const t = dom.window.document.querySelector('.stattable') as HTMLTableElement
+        const records = [...t.tBodies[0].rows].slice(1).map(x => {
+            const row = [...x.cells].map(x => x.textContent)
+            const deltaParts = row[4].replace('+', '').split(' ')
+            const record = new VdtRecord();
+            const placeStr = row[0].replace(')', '');
+            record.id = `${vdt.date}_${placeStr}`
+            record.place = Number(placeStr)
+            record.globalPlace = Number(row[1])
+            record.name = row[2].trim()
+            record.time = Number(row[3].split('+')[0])
+            record.drone = row[5]
+            record.updates = Number(row[7])
+            record.updateTime = row[6]
+            record.deltaTime = Number(deltaParts[0])
+            record.deltaPercent = deltaParts[1] === '' ? 0 : Number(deltaParts[1].replaceAll(/[()%]/g, ''))
+            record.vdt = vdt
+            return record
+        })
+        console.log(`save ${vdt.date} ${((i / vdtList.length) * 100).toFixed(1)}% (${i})`)
+        dataSource.manager.save(records)
+        await new Promise(resolve =>
+            setTimeout(resolve, 50)
+        )
+    }
+
     const client = new ftp.Client()
     client.ftp.verbose = true
     try {
