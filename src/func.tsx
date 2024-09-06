@@ -6,7 +6,13 @@ export const handleResponse = (res: Response): Response => {
 export const sum = (a: number, b: number) => a + b
 
 export const findLongestStreak = (days: number[]): number => {
-    const x = days.slice().sort().reduce((a, c) => {
+    if (days.length === 0) return 0;
+    const x = days.slice().sort((a, b) => a - b).reduce((a, c, index) => {
+        if (index === 0) {
+            a.prev = c;
+            return a;
+        }
+
         const streak = a.prev + 1 === c;
         if (streak) {
             a.streaks[a.streaks.length - 1]++
