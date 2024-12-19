@@ -9,7 +9,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d vdt-stats"
+    "deploy": "gh-pages -f -d vdt-stats"
   },
   "dependencies": {
     "@stdlib/stats-lowess": "^0.1.0",

@@ -135,8 +135,10 @@ console.log('start..');
         const res = await fetch(vdt.url).then(res => res.text())
         const dom = new JSDOM(res, { url: vdtBaseUrl })
         const t = dom.window.document.querySelector('.stattable') as HTMLTableElement
-        const records = [...t.tBodies[0].rows].slice(1).map(x => {
-            const row = [...x.cells].map(x => x.textContent)
+        const records = [...t.tBodies[0].rows].slice(1).flatMap(x => {
+            const row = [...x.cells].map(x => x.textContent.trim())
+            if (row.length !== 8) return []
+            try {
             const deltaParts = row[4].replace('+', '').split(' ')
             const record = new VdtRecord();
             const placeStr = row[0].replace(')', '');
@@ -149,9 +151,13 @@ console.log('start..');
             record.updates = Number(row[7])
             record.updateTime = row[6]
             record.deltaTime = Number(deltaParts[0])
-            record.deltaPercent = deltaParts[1] === '' ? 0 : Number(deltaParts[1].replaceAll(/[()%]/g, ''))
+                record.deltaPercent = deltaParts[1] == '' || deltaParts.length === 1 ? 0 : Number(deltaParts[1].replaceAll(/[()%]/g, ''))
             record.vdt = vdt
-            return record
+                return [record]
+            } catch (e) {
+                console.log(row)
+                throw e
+            }
         })
         console.log(`save (records: ${records.length}) ${vdt.date} ${((i / vdtList.length) * 100).toFixed(1)}% (${i + 1})`)
         dataSource.manager.save(records)
