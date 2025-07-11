@@ -11,6 +11,9 @@ on:
 
   workflow_dispatch:
 
+env:
+  TZ: Europe/Moscow
+
 jobs:
   build:
     runs-on: ubuntu-latest

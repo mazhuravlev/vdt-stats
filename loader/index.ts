@@ -1,5 +1,6 @@
 import { JSDOM } from 'jsdom'
 import * as df from 'date-fns'
+import { toZonedTime } from 'date-fns-tz'
 import { DataSource, ManyToOne, Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity()
@@ -99,7 +100,7 @@ console.log('start..');
     console.log(`Received ${_vdtList.length} VDT`)
 
 
-    const today = df.format(df.subDays(new Date(), 1), 'yyyy-MM-dd')
+    const today = df.format(toZonedTime(new Date(), 'Europe/Moscow'), 'yyyy-MM-dd')
     const recordDeleteResult = await dataSource
         .getRepository(VdtRecord)
         .createQueryBuilder('vdtRecord')
@@ -139,20 +140,20 @@ console.log('start..');
             const row = [...x.cells].map(x => x.textContent.trim())
             if (row.length !== 8) return []
             try {
-            const deltaParts = row[4].replace('+', '').split(' ')
-            const record = new VdtRecord();
-            const placeStr = row[0].replace(')', '');
-            record.id = `${vdt.date}_${placeStr}`
-            record.place = Number(placeStr)
-            record.globalPlace = Number(row[1])
-            record.name = row[2].trim()
-            record.time = Number(row[3].split('+')[0])
-            record.drone = row[5]
-            record.updates = Number(row[7])
-            record.updateTime = row[6]
-            record.deltaTime = Number(deltaParts[0])
+                const deltaParts = row[4].replace('+', '').split(' ')
+                const record = new VdtRecord();
+                const placeStr = row[0].replace(')', '');
+                record.id = `${vdt.date}_${placeStr}`
+                record.place = Number(placeStr)
+                record.globalPlace = Number(row[1])
+                record.name = row[2].trim()
+                record.time = Number(row[3].split('+')[0])
+                record.drone = row[5]
+                record.updates = Number(row[7])
+                record.updateTime = row[6]
+                record.deltaTime = Number(deltaParts[0])
                 record.deltaPercent = deltaParts[1] == '' || deltaParts.length === 1 ? 0 : Number(deltaParts[1].replaceAll(/[()%]/g, ''))
-            record.vdt = vdt
+                record.vdt = vdt
                 return [record]
             } catch (e) {
                 console.log(row)
