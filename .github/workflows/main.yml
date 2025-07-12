@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 on:
@@ -27,13 +25,20 @@ jobs:
         with:
           ref: gh-pages
           path: pages
-      - name: work
+      - name: Prepare input files
         run: |
           cp ${{github.workspace}}/pages/data/vdt.db ${{github.workspace}}/app/public/data/vdt.db
+      - name: Install dependencies
+        run: |
           cd app/loader
           npm i
+      - name: Build and run work
+        run: |
+          cd app/loader
           npm run build
           npm run work
+      - name: Make output files
+        run: |
           cp ${{github.workspace}}/app/public/data/vdt.db ${{github.workspace}}/pages/data/vdt.db
           cd ${{github.workspace}}/pages/data/
           zip vdt.zip vdt.db
