@@ -30,9 +30,8 @@ jobs:
       - name: work
         run: |
           cp ${{github.workspace}}/pages/data/vdt.db ${{github.workspace}}/app/public/data/vdt.db
-          npm ci
           cd app/loader
-          npm ci
+          npm i
           npm run build
           npm run work
           cp ${{github.workspace}}/app/public/data/vdt.db ${{github.workspace}}/pages/data/vdt.db
