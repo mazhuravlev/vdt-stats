@@ -13,6 +13,8 @@
   "dependencies": {
     "@types/jsdom": "^21.1.6",
     "basic-ftp": "5.0.3",
+    "date-fns": "4.1.0",
+    "date-fns-tz": "3.2.0",
     "jsdom": "^22.1.0",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.17"
