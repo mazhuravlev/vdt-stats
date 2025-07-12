@@ -29,9 +29,9 @@ jobs:
           cp ${{github.workspace}}/pages/data/vdt.db ${{github.workspace}}/app/public/data/vdt.db
       - name: Install dependencies
         run: |
-          npm ci
+          npm i
           cd app/loader
-          npm ci
+          npm i
       - name: Build and run work
         run: |
           cd app/loader
