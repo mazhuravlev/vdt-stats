@@ -1,0 +1,47 @@
+# .github/workflows/test_main.yml
+
+name: Test CI Workflow
+
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+env:
+  TZ: Europe/Moscow
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v3
+        with:
+          path: app
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          path: pages
+      - name: Prepare test environment
+        run: |
+          cp ${{github.workspace}}/pages/data/vdt.db ${{github.workspace}}/app/public/data/vdt.db
+      - name: Install dependencies
+        run: |
+          cd app/loader
+          npm ci
+      - name: Build and run work
+        run: |
+          cd app/loader
+          npm run build
+          npm run work
+      - name: Check output files
+        run: |
+          cp ${{github.workspace}}/app/public/data/vdt.db ${{github.workspace}}/pages/data/vdt.db
+          cd ${{github.workspace}}/pages/data/
+          zip vdt.zip vdt.db
+          test -f vdt.db
+          test -f vdt.zip
+      - name: Output success
+        run: echo "Test workflow completed successfully."
