@@ -106,7 +106,7 @@ export const Pilot: React.FC<PilotProps> = (props) => {
           onChange={(e) => setName_ui(e.value)}
           dropdown />
         {pilot &&
-          <Link to={{ pathname: '/races', search: `pilot=${pilot.name}` }}>
+          <Link to={{ pathname: '/races', search: `pilot=${encodeURIComponent(pilot.name)}` }}>
             <Button className='mx-2'>{t('pilot.raceList')}</Button>
           </Link>}
       </div>

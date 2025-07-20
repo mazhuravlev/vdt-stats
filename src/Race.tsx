@@ -134,7 +134,7 @@ export const Race: React.FC<RaceIndexProps> = (props) => {
         <DataTable size='small' value={records}>
             <Column field='place' header='VDT place' />
             <Column field='globalPlace' header='VD place' />
-            <Column body={x => <Link to={`/pilot/${x.name}`}>{x.name}</Link>} header='Name' />
+            <Column body={x => <Link to={`/pilot/${encodeURIComponent(x.name)}`}>{x.name}</Link>} header='Name' />
             <Column field='drone' header='Drone' />
             <Column field='time' header='Time' />
             <Column field='updates' header='Updates' />

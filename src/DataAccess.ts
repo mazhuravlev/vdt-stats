@@ -1,7 +1,8 @@
 import { assertDefined, assertString, assertTrue, findLongestStreak, parseTrackName, sum } from "./func"
 import { PilotData, PilotRecord, TrackSummary, Vdt, VdtRecord, vdtDateFormat } from "./types"
 import { defaultPilotsReplacement } from "./defaultPilotsReplacement"
-import initSqlJs, { Database } from "sql.js"
+import initSqlJs, { Database } from 'sql.js/dist/sql-wasm.js';
+import wasmBinary from 'sql.js/dist/sql-wasm.wasm?url';
 import * as df from 'date-fns'
 import { Nullable } from "primereact/ts-helpers"
 import * as zip from "@zip.js/zip.js"
@@ -21,7 +22,7 @@ export class DataAccess {
 
     constructor() {
         const sql = initSqlJs({
-            locateFile: file => `${import.meta.env.BASE_URL}data/${file}`
+            locateFile: () => wasmBinary,
         })
         const dbUrl = `${import.meta.env.BASE_URL}data/vdt.zip`;
         const data = fetch(dbUrl).then(res => res.blob())

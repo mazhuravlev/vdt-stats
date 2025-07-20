@@ -142,9 +142,10 @@ export const Pilots: React.FC<PilotsProps> = (props) => {
                 sortOrder={1}
             >
                 <Column header="#" body={(_, props) => props.rowIndex + 1} />
-                <Column sortable field="name" header={t('pilots.name')} body={p => <Link to={`/pilot/${p.name}`}>{p.name}</Link>} />
+                <Column sortable field="name" header={t('pilots.name')} body={
+                    p => <Link to={`/pilot/${encodeURIComponent(p.name)}`}>{p.name}</Link>} />
                 <Column sortable field="name" header={t('pilots.races')}
-                    body={p => <Link to={{ pathname: '/races', search: `pilot=${p.name}` }}>↗</Link>} />
+                    body={p => <Link to={{ pathname: '/races', search: `pilot=${encodeURIComponent(p.name)}` }}>↗</Link>} />
                 <Column sortable field="race_count" header={t('pilots.raceCount')} />
                 <Column sortable field="avg_delta" header={t('pilots.avgDelta')} body={x => x.avg_delta?.toFixed(2) ?? '—'} />
                 <Column sortable field="total_updates" header={t('pilots.totalUpdates')} />
